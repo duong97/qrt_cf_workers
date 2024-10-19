@@ -39,7 +39,7 @@ export default {
 		// Check if the API key is valid
 		if (!isValidApiKey && !isFromCf) {
 			// Incorrect key supplied. Reject the request.
-			return new Response("Sorry, you have supplied an invalid key5!", {
+			return new Response("Sorry, you have supplied an invalid key6!", {
 				status: 403,
 				headers: corsHeaders
 			});
