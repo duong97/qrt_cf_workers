@@ -17,8 +17,13 @@ export default {
 		// Authentication
 		const AUTH_HEADER_KEY = "X-API-KEY";
 		const AUTH_HEADER_VALUE = "eccfd07c-6ecc-4882-8e4e-f8ac8639a82d";
+		// @ts-ignore
+		let api_key = env['EXTERNAL_API_KEY'] || '';
+		if (!api_key) {
+			api_key = AUTH_HEADER_VALUE;
+		}
 		const psk = request.headers.get(AUTH_HEADER_KEY);
-		const isValidApiKey = psk === AUTH_HEADER_VALUE;
+		const isValidApiKey = psk === api_key;
 
 		const isFromCf = request.cf?.asOrganization === 'Cloudflare';
 		const corsHeaders = getBaseHeader();
