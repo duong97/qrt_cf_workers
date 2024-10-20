@@ -10,20 +10,19 @@
  *
  * Learn more at https://developers.cloudflare.com/workers/
  */
+interface ENV {
+	EXTERNAL_API_KEY?: string;
+	D1_DB?: D1Database;
+}
 
 export default {
 	// @ts-ignore
-	async fetch(request, env): Promise<Response> {
+	async fetch(request: Request, env :ENV): Promise<Response> {
 		// Authentication
 		const AUTH_HEADER_KEY = "X-API-KEY";
-		const AUTH_HEADER_VALUE = "eccfd07c-6ecc-4882-8e4e-f8ac8639a82d";
-		// @ts-ignore
-		let api_key = env['EXTERNAL_API_KEY'] || '';
-		if (!api_key) {
-			api_key = AUTH_HEADER_VALUE;
-		}
-		const psk = request.headers.get(AUTH_HEADER_KEY);
-		const isValidApiKey = psk === api_key;
+		const API_KEY = env.EXTERNAL_API_KEY;
+		const userApiKey = request.headers.get(AUTH_HEADER_KEY);
+		const isValidApiKey = userApiKey === API_KEY;
 
 		const isFromCf = request.cf?.asOrganization === 'Cloudflare';
 		const corsHeaders = getBaseHeader();
@@ -47,8 +46,13 @@ export default {
 
 		// BEGIN API config
 		const { pathname } = new URL(request.url);
-		// @ts-ignore
-		const db = env['prod-qrt'];
+		const db = env.D1_DB;
+
+		if (!db) {
+			return new Response("DB not found!", {
+				headers: corsHeaders
+			});
+		}
 
 		// API WITH GET METHOD
 		if (request.method === 'GET') {
@@ -61,7 +65,7 @@ export default {
 				).first();
 				apiResult = {
 					version: queryResult?.version,
-					updated_at: queryResult.updated_at
+					updated_at: queryResult?.updated_at
 				};
 			}
 
