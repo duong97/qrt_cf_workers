@@ -10,21 +10,19 @@
  *
  * Learn more at https://developers.cloudflare.com/workers/
  */
-interface ENV {
-	EXTERNAL_API_KEY?: string;
-	D1_DB?: D1Database;
-}
+import route from './route/index';
+import { ValidateResult } from './class/ValidateResult';
 
 export default {
 	// @ts-ignore
-	async fetch(request: Request, env :ENV): Promise<Response> {
+	async fetch(request: Request, env :Env): Promise<Response> {
 		// Authentication
 		const AUTH_HEADER_KEY = "X-API-KEY";
 		const API_KEY = env.EXTERNAL_API_KEY;
 		const userApiKey = request.headers.get(AUTH_HEADER_KEY);
 		const isValidApiKey = userApiKey === API_KEY;
 
-		const isFromCf = request.cf?.asOrganization === 'Cloudflare';
+		const isFromCf = request.cf;
 		const corsHeaders = getBaseHeader();
 
 		// Handle CORS preflight request (OPTIONS)
@@ -45,7 +43,6 @@ export default {
 		}
 
 		// BEGIN API config
-		const { pathname } = new URL(request.url);
 		const db = env.D1_DB;
 
 		if (!db) {
@@ -54,53 +51,29 @@ export default {
 			});
 		}
 
-		// API WITH GET METHOD
-		if (request.method === 'GET') {
-			let apiResult = null;
-
-			if (pathname === "/api/menu_version") {
-				// Get menu data changed version
-				const queryResult = await db.prepare(
-					"SELECT * FROM version"
-				).first();
-				apiResult = {
-					version: queryResult?.version,
-					updated_at: queryResult?.updated_at
-				};
-			}
-
-			// List categories
-			if (pathname === "/api/categories") {
-				const queryResult = await db.prepare(
-					"SELECT * FROM categories"
-				).all();
-
-				apiResult = queryResult.results;
-			}
-
-			// List products
-			if (pathname === "/api/products") {
-				const queryResult = await db.prepare(
-					"SELECT * FROM products"
-				).all();
-
-				apiResult = queryResult.results;
-			}
-
-			// List options (duplicated with products, may need correction)
-			if (pathname === "/api/options") {
-				const queryResult = await db.prepare(
-					"SELECT * FROM options"
-				).all();
-
-				apiResult = queryResult.results;
-			}
-
+		// Routing
+		const response = await route.routeConfig(request, env);
+		if (response.success) {
 			corsHeaders.set('Content-Type', 'application/json');
-			return new Response(JSON.stringify(apiResult), {
+
+			// Validate error
+			let responseStatus = 200;
+			if (response.data instanceof ValidateResult && response.data.hasError()) {
+				responseStatus = 400;
+			}
+
+			// Send response
+			return new Response(JSON.stringify(response.data), {
+				status: responseStatus,
 				headers: corsHeaders
 			});
 		}
+
+		// Not match any route
+		return new Response("Not found", {
+			status: 404,
+			headers: corsHeaders
+		});
 	},
 } satisfies ExportedHandler<Env>;
 
