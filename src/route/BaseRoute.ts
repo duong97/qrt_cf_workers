@@ -19,6 +19,10 @@ export class BaseRoute {
 				return await this.get();
 			case 'post':
 				return await this.post();
+			case 'patch':
+				return await this.patch();
+			case 'delete':
+				return await this.delete();
 		}
 	}
 
@@ -31,6 +35,17 @@ export class BaseRoute {
 	}
 
 	async post() {
-		return await this.model.create(this.data);
+		if (Array.isArray(this.data)) {
+			return await this.model.createMultiple(this.data);
+		} else {
+			return await this.model.create(this.data);
+		}
+	}
+
+	async patch() {
+		return await this.model.update(this.id, this.data);
+	}
+	async delete() {
+		return await this.model.delete(this.id);
 	}
 }

@@ -7,12 +7,17 @@ export class Category extends BaseModel {
 	}
 
 	validate(data: any) {
-		if (!data.name) {
+		const fields = this.fields(data);
+		if (!fields.name) {
 			return new ValidateResult(false, "Tên không được để trống");
 		}
 
-		return new ValidateResult(true);
+		return new ValidateResult(true, null, fields);
 	}
 
-	// @todo get only property of object like name only when create category
+	fields(data: any) {
+		return {
+			name: data?.name as string,
+		}
+	}
 }

@@ -70,7 +70,7 @@ export default {
 		}
 
 		// Not match any route
-		return new Response("Not found", {
+		return new Response("Invalid request!", {
 			status: 404,
 			headers: corsHeaders
 		});
