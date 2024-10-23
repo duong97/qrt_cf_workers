@@ -28,7 +28,12 @@ export default  {
 		let route = null;
 		if (model) {
 			const { searchParams } = new URL(request.url);
-			const bodyData = await request.json().then( r => r);
+			let bodyData = null;
+			try {
+				bodyData = await request.json().then( r => r);
+			} catch (e: any) {
+				// console.log("Error in parse body json: " + e?.message);
+			}
 			route = new BaseRoute(request.method, model, searchParams.get('id'), bodyData);
 		}
 
