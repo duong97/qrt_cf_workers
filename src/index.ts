@@ -82,8 +82,8 @@ function getBaseHeader(): Headers {
 
 	// Set CORS headers for the main request response
 	newHeaders.set('Access-Control-Allow-Origin', '*');  // Allow all origins, modify for security
-	newHeaders.set('Access-Control-Allow-Methods', 'GET,HEAD,POST,OPTIONS');
-	newHeaders.set('Access-Control-Allow-Headers', 'Content-Type, X-API-KEY, Authorization');
+	newHeaders.set('Access-Control-Allow-Methods', '*');
+	newHeaders.set('Access-Control-Allow-Headers', '*');
 
 	return newHeaders;
 }
