@@ -22,4 +22,11 @@ export class ProductOption extends BaseModel {
 			items: JSON.stringify(data?.items || {}) as string,
 		}
 	}
+
+	formatResponse(result: any): any {
+		// format items as array
+		result.items = this.toArray(result.items);
+
+		return result;
+	}
 }

@@ -11,16 +11,31 @@ export abstract class BaseModel {
 
 	abstract validate(data: any): ValidateResult;
 	abstract fields(data: any): any;
+	abstract formatResponse(result: any): any;
+
+	toArray(data: any): object
+	{
+		if (typeof data === 'string') {
+			data = JSON.parse(data);
+		}
+		if (!data || typeof data !== 'object') {
+			data = [];
+		}
+		return data;
+	}
 
 	async findAll() {
 		const query = `SELECT * FROM ${this.tableName}`;
 		const { results } = await this.db.prepare(query).all();
+		if (Array.isArray(results)) {
+			return results.map(row => this.formatResponse(row));
+		}
 		return results;
 	}
 
 	async findById(id: string|number) {
 		const query = `SELECT * FROM ${this.tableName} WHERE id = ?`;
-		return await this.db.prepare(query).bind(id).first();
+		return this.formatResponse(await this.db.prepare(query).bind(id).first());
 	}
 
 	async create(data: any) {

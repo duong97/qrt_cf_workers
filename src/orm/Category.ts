@@ -20,4 +20,8 @@ export class Category extends BaseModel {
 			name: data?.name as string,
 		}
 	}
+
+	formatResponse(result: any): any {
+		return result;
+	}
 }

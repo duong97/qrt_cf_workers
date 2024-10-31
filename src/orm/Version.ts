@@ -24,4 +24,8 @@ export class Version extends BaseModel {
 			updated_at: Date.now(),
 		}
 	}
+
+	formatResponse(result: any): any {
+		return result;
+	}
 }
