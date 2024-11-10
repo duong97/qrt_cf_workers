@@ -6,9 +6,9 @@ export class ProductOption extends BaseModel {
 		super('options', db); // Pass the table name to the base model
 	}
 
-	validate(data: any) {
-		const fields = this.fields(data);
-		if (!fields.name) {
+	validate(data: any, id?: number) {
+		const fields = this.removeUndefinedValue(this.fields(data));
+		if (!id && !fields.name) {
 			return new ValidateResult(false, "Tên không được để trống");
 		}
 

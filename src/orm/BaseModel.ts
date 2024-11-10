@@ -9,7 +9,7 @@ export abstract class BaseModel {
 		this.db = db;
 	}
 
-	abstract validate(data: any): ValidateResult;
+	abstract validate(data: any, id?: number): ValidateResult;
 	abstract fields(data: any): any;
 	abstract formatResponse(result: any): any;
 
@@ -22,6 +22,12 @@ export abstract class BaseModel {
 			data = [];
 		}
 		return data;
+	}
+
+	removeUndefinedValue(obj: any): any {
+		return Object.fromEntries(
+			Object.entries(obj).filter(([_, value]) => value !== undefined)
+		);
 	}
 
 	async findAll() {
@@ -76,7 +82,7 @@ export abstract class BaseModel {
 			return new ValidateResult(false, "Missing id value");
 		}
 
-		const validate = this.validate(data);
+		const validate = this.validate(data, id);
 		if (validate.hasError()) {
 			return validate;
 		}
@@ -84,6 +90,10 @@ export abstract class BaseModel {
 		const updates = Object.keys(validate.fields).map((key) => `${key} = ?`).join(', ');
 		const values = [...Object.values(validate.fields), id];
 		const query = `UPDATE ${this.tableName} SET ${updates} WHERE id = ?`;
+
+		if (!updates) {
+			return new ValidateResult(true, "Nothing to update");
+		}
 
 		try {
 			return await this.db.prepare(query).bind(...values).run();

@@ -8,8 +8,8 @@ export class Version extends BaseModel {
 		super('version', db); // Pass the table name to the base model
 	}
 
-	validate(data: any) {
-		const fields = this.fields(data);
+	validate(data: any, id?: number) {
+		const fields = this.removeUndefinedValue(this.fields(data));
 		if (!fields.type || !fields.version) {
 			return new ValidateResult(false, "Type or version is empty!");
 		}

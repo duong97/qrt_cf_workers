@@ -6,9 +6,9 @@ export class Product extends BaseModel {
 		super('products', db); // Pass the table name to the base model
 	}
 
-	validate(data: any) {
-		const fields = this.fields(data);
-		if (!fields.name) {
+	validate(data: any, id?: number) {
+		const fields = this.removeUndefinedValue(this.fields(data));
+		if (!id && !fields.name) {
 			return new ValidateResult(false, "Tên không được để trống");
 		}
 
@@ -22,7 +22,7 @@ export class Product extends BaseModel {
 			description: data?.description as string,
 			thumbnail: data?.thumbnail as string,
 			category: data?.category as number,
-			options: JSON.stringify(data?.options || {}) as string,
+			options: (data?.options ? JSON.stringify(data?.options) : undefined) as string,
 		};
 	}
 
