@@ -41,6 +41,7 @@ export default  {
 		}
 
 		const routingData = await route?.route();
+		const responseData = new ResponseData(!!route, routingData);
 
 		// Upload image after save data
 		const lastRowId = routingData?.meta?.last_row_id || id;
@@ -61,6 +62,7 @@ export default  {
 						updatedData = {
 							thumbnail: baseImagePath + path2save
 						};
+						responseData.markAsFileUploaded();
 					}
 					break;
 			}
@@ -71,6 +73,6 @@ export default  {
 			}
 		}
 
-		return new ResponseData(!!route, routingData);
+		return responseData;
 	}
 }

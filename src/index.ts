@@ -63,7 +63,12 @@ export default {
 			}
 
 			// Send response
-			return new Response(JSON.stringify(response.data), {
+			let responseData = response.data;
+			// Response upload file result
+			if (response.isFileUploaded) {
+				responseData.isUploadSuccess = true;
+			}
+			return new Response(JSON.stringify(responseData), {
 				status: responseStatus,
 				headers: corsHeaders
 			});
