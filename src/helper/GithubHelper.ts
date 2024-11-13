@@ -65,8 +65,8 @@ export default class GithubHelper {
 	private readonly baseApiUrl: string;
 	private readonly imagePath: string = '/public/images';
 	private readonly commiter: object = {
-		name: 'auto',
-		email: 'admin@admin.com',
+		name: 'duong97',
+		email: 'nvduong15@gmail.com',
 	};
 
 	constructor(env: Env) {
